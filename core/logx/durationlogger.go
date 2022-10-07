@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zeromicro/go-zero/core/timex"
+	"github.com/jiangz222/go-zero/core/timex"
 )
 
 // WithDuration returns a Logger which logs the given duration.

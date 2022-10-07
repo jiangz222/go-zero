@@ -6,11 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zeromicro/go-zero/core/lang"
-	"github.com/zeromicro/go-zero/core/logx"
-	"github.com/zeromicro/go-zero/core/stat"
-	"github.com/zeromicro/go-zero/core/syncx"
-	"github.com/zeromicro/go-zero/core/timex"
+	"github.com/jiangz222/go-zero/core/lang"
+	"github.com/jiangz222/go-zero/core/logx"
+	"github.com/jiangz222/go-zero/core/stat"
+	"github.com/jiangz222/go-zero/core/syncx"
+	"github.com/jiangz222/go-zero/core/timex"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/peer"
 )

@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/zeromicro/go-zero/core/syncx"
+	"github.com/jiangz222/go-zero/core/syncx"
 	"github.com/zeromicro/go-zero/tools/goctl/util/console"
 )
 

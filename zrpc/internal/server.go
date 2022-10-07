@@ -3,7 +3,7 @@ package internal
 import (
 	"time"
 
-	"github.com/zeromicro/go-zero/core/stat"
+	"github.com/jiangz222/go-zero/core/stat"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/keepalive"

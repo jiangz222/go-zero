@@ -11,9 +11,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jiangz222/go-zero/core/logx"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
-	"github.com/zeromicro/go-zero/core/logx"
 	apiformat "github.com/zeromicro/go-zero/tools/goctl/api/format"
 	"github.com/zeromicro/go-zero/tools/goctl/api/parser"
 	apiutil "github.com/zeromicro/go-zero/tools/goctl/api/util"

@@ -9,8 +9,8 @@ import (
 
 	red "github.com/go-redis/redis/v8"
 
-	"github.com/zeromicro/go-zero/core/logx"
-	"github.com/zeromicro/go-zero/core/stringx"
+	"github.com/jiangz222/go-zero/core/logx"
+	"github.com/jiangz222/go-zero/core/stringx"
 )
 
 const (

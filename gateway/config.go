@@ -3,8 +3,8 @@ package gateway
 import (
 	"time"
 
-	"github.com/zeromicro/go-zero/rest"
-	"github.com/zeromicro/go-zero/zrpc"
+	"github.com/jiangz222/go-zero/rest"
+	"github.com/jiangz222/go-zero/zrpc"
 )
 
 type (

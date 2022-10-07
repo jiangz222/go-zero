@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/zeromicro/go-zero/core/stores/redis"
+	"github.com/jiangz222/go-zero/core/stores/redis"
 )
 
 // to be compatible with aliyun redis, we cannot use `local key = KEYS[1]` to reuse the key

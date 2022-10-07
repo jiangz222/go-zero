@@ -7,10 +7,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zeromicro/go-zero/core/mathx"
-	"github.com/zeromicro/go-zero/core/proc"
-	"github.com/zeromicro/go-zero/core/stat"
-	"github.com/zeromicro/go-zero/core/stringx"
+	"github.com/jiangz222/go-zero/core/mathx"
+	"github.com/jiangz222/go-zero/core/proc"
+	"github.com/jiangz222/go-zero/core/stat"
+	"github.com/jiangz222/go-zero/core/stringx"
 )
 
 const (

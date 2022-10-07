@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/jiangz222/go-zero/core/breaker"
+	"github.com/jiangz222/go-zero/core/logx"
+	"github.com/jiangz222/go-zero/core/stat"
 	"github.com/stretchr/testify/assert"
-	"github.com/zeromicro/go-zero/core/breaker"
-	"github.com/zeromicro/go-zero/core/logx"
-	"github.com/zeromicro/go-zero/core/stat"
 )
 
 func init() {

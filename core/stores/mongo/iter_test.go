@@ -6,10 +6,10 @@ import (
 
 	"github.com/globalsign/mgo"
 	"github.com/golang/mock/gomock"
+	"github.com/jiangz222/go-zero/core/breaker"
+	"github.com/jiangz222/go-zero/core/stringx"
+	"github.com/jiangz222/go-zero/core/syncx"
 	"github.com/stretchr/testify/assert"
-	"github.com/zeromicro/go-zero/core/breaker"
-	"github.com/zeromicro/go-zero/core/stringx"
-	"github.com/zeromicro/go-zero/core/syncx"
 )
 
 func TestClosableIter_Close(t *testing.T) {

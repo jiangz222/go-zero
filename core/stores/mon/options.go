@@ -3,7 +3,7 @@ package mon
 import (
 	"time"
 
-	"github.com/zeromicro/go-zero/core/syncx"
+	"github.com/jiangz222/go-zero/core/syncx"
 )
 
 var slowThreshold = syncx.ForAtomicDuration(defaultSlowThreshold)

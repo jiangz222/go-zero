@@ -7,7 +7,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/zeromicro/go-zero/core/collection"
+	"github.com/jiangz222/go-zero/core/collection"
 	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
 	"github.com/zeromicro/go-zero/tools/goctl/api/util"
 	"github.com/zeromicro/go-zero/tools/goctl/pkg/golang"

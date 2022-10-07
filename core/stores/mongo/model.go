@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/globalsign/mgo"
-	"github.com/zeromicro/go-zero/core/breaker"
+	"github.com/jiangz222/go-zero/core/breaker"
 )
 
 // A Model is a mongo model.

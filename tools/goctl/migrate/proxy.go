@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zeromicro/go-zero/core/stringx"
+	"github.com/jiangz222/go-zero/core/stringx"
 	"github.com/zeromicro/go-zero/tools/goctl/rpc/execx"
 )
 

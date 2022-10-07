@@ -1,9 +1,9 @@
 package metric
 
 import (
+	"github.com/jiangz222/go-zero/core/proc"
+	"github.com/jiangz222/go-zero/core/prometheus"
 	prom "github.com/prometheus/client_golang/prometheus"
-	"github.com/zeromicro/go-zero/core/proc"
-	"github.com/zeromicro/go-zero/core/prometheus"
 )
 
 type (

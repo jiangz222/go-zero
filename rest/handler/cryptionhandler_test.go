@@ -10,8 +10,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/jiangz222/go-zero/core/codec"
 	"github.com/stretchr/testify/assert"
-	"github.com/zeromicro/go-zero/core/codec"
 )
 
 const (
