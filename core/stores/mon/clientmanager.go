@@ -32,15 +32,11 @@ func Inject(key string, client *mongo.Client) {
 
 func getClient(url string, clientOpts ...*mopt.ClientOptions) (*mongo.Client, error) {
 	val, err := clientManager.GetResource(url, func() (io.Closer, error) {
-		var cli *mongo.Client
-		var err error
-		if len(clientOpts) == 0 {
-			cli, err = mongo.Connect(context.Background(), mopt.Client().ApplyURI(url))
-		} else {
-			// Don't find a good way to do both ApplyURI and mergeOptions
-			// so only use what we need here like Registry
-			cli, err = mongo.Connect(context.Background(), mopt.Client().ApplyURI(url).SetRegistry(clientOpts[0].Registry))
+		opt := mopt.Client().ApplyURI(url)
+		if len(clientOpts) > 0 {
+			opt = mopt.MergeClientOptions(clientOpts[0], opt)
 		}
+		cli, err := mongo.Connect(context.Background(), opt)
 
 		if err != nil {
 			return nil, err
