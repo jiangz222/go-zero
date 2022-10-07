@@ -1,4 +1,4 @@
-module github.com/zeromicro/go-zero
+module github.com/jiangz222/go-zero
 
 go 1.16
 
@@ -47,13 +47,6 @@ require (
 )
 
 require (
-	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/mattn/go-runewidth v0.0.13 // indirect
-	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
-	go.uber.org/atomic v1.9.0 // indirect
-	go.uber.org/multierr v1.8.0 // indirect
-	go.uber.org/zap v1.21.0 // indirect
-	golang.org/x/net v0.0.0-20220531201128-c960675eff93 // indirect
+	github.com/zeromicro/go-zero v1.4.1 // 外部 -> jiangz/go-zero vx.x.x -> zeromicro/gozero v1.4.1
 	google.golang.org/genproto v0.0.0-20220602131408-e326c6e8e9c8
-	k8s.io/klog/v2 v2.40.1 // indirect
 )
