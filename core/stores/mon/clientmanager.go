@@ -34,6 +34,7 @@ func getClient(url string, clientOpts ...*mopt.ClientOptions) (*mongo.Client, er
 	val, err := clientManager.GetResource(url, func() (io.Closer, error) {
 		opt := mopt.Client().ApplyURI(url)
 		if len(clientOpts) > 0 {
+			// If options has conflict, opt from URL win.
 			opt = mopt.MergeClientOptions(clientOpts[0], opt)
 		}
 		cli, err := mongo.Connect(context.Background(), opt)
