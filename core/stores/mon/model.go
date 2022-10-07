@@ -46,9 +46,19 @@ func MustNewModel(uri, db, collection string, opts ...Option) *Model {
 	return model
 }
 
+// MustNewModelWithClientOption returns a Model, exits on errors.
+func MustNewModelWithClientOption(uri, db, collection string, clientOpts *mopt.ClientOptions, opts ...Option) *Model {
+	model, err := NewModelWithClientOption(uri, db, collection, clientOpts, opts...)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return model
+}
+
 // NewModel returns a Model.
 func NewModel(uri, db, collection string, opts ...Option) (*Model, error) {
-	cli, err := getClient(uri)
+	cli, err := getClient(uri, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -59,6 +69,18 @@ func NewModel(uri, db, collection string, opts ...Option) (*Model, error) {
 	return newModel(name, cli, coll, brk, opts...), nil
 }
 
+// NewModelWithClientOption returns a Model with client option
+func NewModelWithClientOption(uri, db, collection string, clientOpts *mopt.ClientOptions, opts ...Option) (*Model, error) {
+	cli, err := getClient(uri, clientOpts)
+	if err != nil {
+		return nil, err
+	}
+
+	name := strings.Join([]string{uri, collection}, "/")
+	brk := breaker.GetBreaker(uri)
+	coll := newCollection(cli.Database(db).Collection(collection), brk)
+	return newModel(name, cli, coll, brk, opts...), nil
+}
 func newModel(name string, cli *mongo.Client, coll Collection, brk breaker.Breaker,
 	opts ...Option) *Model {
 	return &Model{
@@ -159,7 +181,7 @@ func (m *Model) FindOneAndDelete(ctx context.Context, v, filter interface{},
 }
 
 // FindOneAndReplace finds a single document and replaces it.
-func (m *Model) FindOneAndReplace(ctx context.Context, v, filter interface{}, replacement interface{},
+func (m *Model) FindOneAndReplace(ctx context.Context, v, filter, replacement interface{},
 	opts ...*mopt.FindOneAndReplaceOptions) error {
 	res, err := m.Collection.FindOneAndReplace(ctx, filter, replacement, opts...)
 	if err != nil {
@@ -170,7 +192,7 @@ func (m *Model) FindOneAndReplace(ctx context.Context, v, filter interface{}, re
 }
 
 // FindOneAndUpdate finds a single document and updates it.
-func (m *Model) FindOneAndUpdate(ctx context.Context, v, filter interface{}, update interface{},
+func (m *Model) FindOneAndUpdate(ctx context.Context, v, filter, update interface{},
 	opts ...*mopt.FindOneAndUpdateOptions) error {
 	res, err := m.Collection.FindOneAndUpdate(ctx, filter, update, opts...)
 	if err != nil {

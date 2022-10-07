@@ -37,6 +37,16 @@ func MustNewModel(uri, db, collection string, c cache.CacheConf, opts ...cache.O
 	return model
 }
 
+// MustNewModelWithClientOptions returns a Model with a cache cluster, exists on errors.
+func MustNewModelWithClientOptions(uri, db, collection string, c cache.CacheConf, clientOpts *mopt.ClientOptions, opts ...cache.Option) *Model {
+	model, err := NewModelWithClientOption(uri, db, collection, c, clientOpts, opts...)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return model
+}
+
 // MustNewNodeModel returns a Model with a cache node, exists on errors.
 func MustNewNodeModel(uri, db, collection string, rds *redis.Redis, opts ...cache.Option) *Model {
 	model, err := NewNodeModel(uri, db, collection, rds, opts...)
@@ -53,9 +63,20 @@ func NewModel(uri, db, collection string, conf cache.CacheConf, opts ...cache.Op
 	return NewModelWithCache(uri, db, collection, c)
 }
 
+// NewModelWithClientOption returns a Model with a cache cluster and client option.
+func NewModelWithClientOption(uri, db, collection string, conf cache.CacheConf, clientOpts *mopt.ClientOptions, opts ...cache.Option) (*Model, error) {
+	c := cache.New(conf, singleFlight, stats, mongo.ErrNoDocuments, opts...)
+	return NewModelWithCacheAndClientOption(uri, db, collection, clientOpts, c)
+}
+
 // NewModelWithCache returns a Model with a custom cache.
 func NewModelWithCache(uri, db, collection string, c cache.Cache) (*Model, error) {
 	return newModel(uri, db, collection, c)
+}
+
+// NewModelWithCacheAndClientOption returns a Model with a custom cache and client option.
+func NewModelWithCacheAndClientOption(uri, db, collection string, clientOpts *mopt.ClientOptions, c cache.Cache) (*Model, error) {
+	return newModelWithClientOption(uri, db, collection, clientOpts, c)
 }
 
 // NewNodeModel returns a Model with a cache node.
@@ -67,6 +88,19 @@ func NewNodeModel(uri, db, collection string, rds *redis.Redis, opts ...cache.Op
 // newModel returns a Model with the given cache.
 func newModel(uri, db, collection string, c cache.Cache) (*Model, error) {
 	model, err := mon.NewModel(uri, db, collection)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Model{
+		Model: model,
+		cache: c,
+	}, nil
+}
+
+// WithClientOption returns a Model with the given cache and ClientOption
+func newModelWithClientOption(uri, db, collection string, clientOpts *mopt.ClientOptions, c cache.Cache) (*Model, error) {
+	model, err := mon.NewModelWithClientOption(uri, db, collection, clientOpts)
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +226,7 @@ func (mm *Model) InsertOneNoCache(ctx context.Context, document interface{},
 }
 
 // ReplaceOne replaces a single document in the collection, and remove the cache.
-func (mm *Model) ReplaceOne(ctx context.Context, key string, filter interface{}, replacement interface{},
+func (mm *Model) ReplaceOne(ctx context.Context, key string, filter, replacement interface{},
 	opts ...*mopt.ReplaceOptions) (*mongo.UpdateResult, error) {
 	res, err := mm.Model.ReplaceOne(ctx, filter, replacement, opts...)
 	if err != nil {
@@ -207,7 +241,7 @@ func (mm *Model) ReplaceOne(ctx context.Context, key string, filter interface{},
 }
 
 // ReplaceOneNoCache replaces a single document in the collection.
-func (mm *Model) ReplaceOneNoCache(ctx context.Context, filter interface{}, replacement interface{},
+func (mm *Model) ReplaceOneNoCache(ctx context.Context, filter, replacement interface{},
 	opts ...*mopt.ReplaceOptions) (*mongo.UpdateResult, error) {
 	return mm.Model.ReplaceOne(ctx, filter, replacement, opts...)
 }
@@ -218,7 +252,7 @@ func (mm *Model) SetCache(key string, v interface{}) error {
 }
 
 // UpdateByID updates the document with given id with update, and remove the cache.
-func (mm *Model) UpdateByID(ctx context.Context, key string, id interface{}, update interface{},
+func (mm *Model) UpdateByID(ctx context.Context, key string, id, update interface{},
 	opts ...*mopt.UpdateOptions) (*mongo.UpdateResult, error) {
 	res, err := mm.Model.UpdateByID(ctx, id, update, opts...)
 	if err != nil {
@@ -233,13 +267,13 @@ func (mm *Model) UpdateByID(ctx context.Context, key string, id interface{}, upd
 }
 
 // UpdateByIDNoCache updates the document with given id with update.
-func (mm *Model) UpdateByIDNoCache(ctx context.Context, id interface{}, update interface{},
+func (mm *Model) UpdateByIDNoCache(ctx context.Context, id, update interface{},
 	opts ...*mopt.UpdateOptions) (*mongo.UpdateResult, error) {
 	return mm.Model.UpdateByID(ctx, id, update, opts...)
 }
 
 // UpdateMany updates the documents that match filter with update, and remove the cache.
-func (mm *Model) UpdateMany(ctx context.Context, keys []string, filter interface{}, update interface{},
+func (mm *Model) UpdateMany(ctx context.Context, keys []string, filter, update interface{},
 	opts ...*mopt.UpdateOptions) (*mongo.UpdateResult, error) {
 	res, err := mm.Model.UpdateMany(ctx, filter, update, opts...)
 	if err != nil {
@@ -254,13 +288,13 @@ func (mm *Model) UpdateMany(ctx context.Context, keys []string, filter interface
 }
 
 // UpdateManyNoCache updates the documents that match filter with update.
-func (mm *Model) UpdateManyNoCache(ctx context.Context, filter interface{}, update interface{},
+func (mm *Model) UpdateManyNoCache(ctx context.Context, filter, update interface{},
 	opts ...*mopt.UpdateOptions) (*mongo.UpdateResult, error) {
 	return mm.Model.UpdateMany(ctx, filter, update, opts...)
 }
 
 // UpdateOne updates the first document that matches filter with update, and remove the cache.
-func (mm *Model) UpdateOne(ctx context.Context, key string, filter interface{}, update interface{},
+func (mm *Model) UpdateOne(ctx context.Context, key string, filter, update interface{},
 	opts ...*mopt.UpdateOptions) (*mongo.UpdateResult, error) {
 	res, err := mm.Model.UpdateOne(ctx, filter, update, opts...)
 	if err != nil {
@@ -275,7 +309,7 @@ func (mm *Model) UpdateOne(ctx context.Context, key string, filter interface{}, 
 }
 
 // UpdateOneNoCache updates the first document that matches filter with update.
-func (mm *Model) UpdateOneNoCache(ctx context.Context, filter interface{}, update interface{},
+func (mm *Model) UpdateOneNoCache(ctx context.Context, filter, update interface{},
 	opts ...*mopt.UpdateOptions) (*mongo.UpdateResult, error) {
 	return mm.Model.UpdateOne(ctx, filter, update, opts...)
 }
