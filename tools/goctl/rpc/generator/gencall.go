@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/emicklei/proto"
-	"github.com/jiangz222/go-zero/core/collection"
+	"github.com/zeromicro/go-zero/core/collection"
 	conf "github.com/zeromicro/go-zero/tools/goctl/config"
 	"github.com/zeromicro/go-zero/tools/goctl/rpc/parser"
 	"github.com/zeromicro/go-zero/tools/goctl/util"

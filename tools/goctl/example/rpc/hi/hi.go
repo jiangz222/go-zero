@@ -10,9 +10,9 @@ import (
 	"github.com/zeromicro/go-zero/tools/goctl/example/rpc/hi/internal/svc"
 	"github.com/zeromicro/go-zero/tools/goctl/example/rpc/hi/pb/hi"
 
-	"github.com/jiangz222/go-zero/core/conf"
-	"github.com/jiangz222/go-zero/core/service"
-	"github.com/jiangz222/go-zero/zrpc"
+	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/core/service"
+	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
