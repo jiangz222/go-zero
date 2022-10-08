@@ -1,6 +1,6 @@
 package fx
 
-import "github.com/jiangz222/go-zero/core/threading"
+import "github.com/zeromicro/go-zero/core/threading"
 
 // Parallel runs fns parallelly and waits for done.
 func Parallel(fns ...func()) {

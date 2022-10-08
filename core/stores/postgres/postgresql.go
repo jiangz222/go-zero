@@ -1,9 +1,9 @@
 package postgres
 
 import (
-	// imports the driver, don't remove this comment, golint requires.
-	"github.com/jiangz222/go-zero/core/stores/sqlx"
 	_ "github.com/lib/pq"
+	// imports the driver, don't remove this comment, golint requires.
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 const postgresDriverName = "postgres"

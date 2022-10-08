@@ -7,11 +7,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jiangz222/go-zero/core/lang"
-	"github.com/jiangz222/go-zero/core/stringx"
-	"github.com/jiangz222/go-zero/core/syncx"
-	"github.com/jiangz222/go-zero/core/timex"
 	"github.com/stretchr/testify/assert"
+	"github.com/zeromicro/go-zero/core/lang"
+	"github.com/zeromicro/go-zero/core/stringx"
+	"github.com/zeromicro/go-zero/core/syncx"
+	"github.com/zeromicro/go-zero/core/timex"
 )
 
 const (

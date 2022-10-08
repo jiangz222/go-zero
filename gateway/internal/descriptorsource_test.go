@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/fullstorydev/grpcurl"
-	"github.com/jiangz222/go-zero/core/hash"
 	"github.com/stretchr/testify/assert"
+	"github.com/zeromicro/go-zero/core/hash"
 )
 
 const (

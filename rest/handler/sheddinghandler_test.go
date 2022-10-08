@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/jiangz222/go-zero/core/load"
-	"github.com/jiangz222/go-zero/core/stat"
 	"github.com/stretchr/testify/assert"
+	"github.com/zeromicro/go-zero/core/load"
+	"github.com/zeromicro/go-zero/core/stat"
 )
 
 func init() {

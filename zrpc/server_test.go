@@ -4,14 +4,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jiangz222/go-zero/core/discov"
-	"github.com/jiangz222/go-zero/core/logx"
-	"github.com/jiangz222/go-zero/core/service"
-	"github.com/jiangz222/go-zero/core/stat"
-	"github.com/jiangz222/go-zero/core/stores/redis"
-	"github.com/jiangz222/go-zero/zrpc/internal"
-	"github.com/jiangz222/go-zero/zrpc/internal/serverinterceptors"
 	"github.com/stretchr/testify/assert"
+	"github.com/zeromicro/go-zero/core/discov"
+	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/service"
+	"github.com/zeromicro/go-zero/core/stat"
+	"github.com/zeromicro/go-zero/core/stores/redis"
+	"github.com/zeromicro/go-zero/zrpc/internal"
+	"github.com/zeromicro/go-zero/zrpc/internal/serverinterceptors"
 	"google.golang.org/grpc"
 )
 

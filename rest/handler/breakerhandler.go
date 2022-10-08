@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/jiangz222/go-zero/core/breaker"
-	"github.com/jiangz222/go-zero/core/logx"
-	"github.com/jiangz222/go-zero/core/stat"
-	"github.com/jiangz222/go-zero/rest/httpx"
-	"github.com/jiangz222/go-zero/rest/internal/response"
+	"github.com/zeromicro/go-zero/core/breaker"
+	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stat"
+	"github.com/zeromicro/go-zero/rest/httpx"
+	"github.com/zeromicro/go-zero/rest/internal/response"
 )
 
 const breakerSeparator = "://"

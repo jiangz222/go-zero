@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jiangz222/go-zero/core/timex"
+	"github.com/zeromicro/go-zero/core/timex"
 	"go.opentelemetry.io/otel/trace"
 )
 
