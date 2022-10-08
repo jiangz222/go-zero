@@ -8,7 +8,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/jiangz222/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/tools/goctl/api/spec"
 	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )

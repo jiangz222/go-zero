@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/jiangz222/go-zero/core/stringx"
 	"github.com/stretchr/testify/assert"
+	"github.com/zeromicro/go-zero/core/stringx"
 	"github.com/zeromicro/go-zero/tools/goctl/util/pathx"
 )
 

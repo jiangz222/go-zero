@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jiangz222/go-zero/core/stores/sqlc"
-	"github.com/jiangz222/go-zero/core/stores/sqlx"
-	"github.com/jiangz222/go-zero/core/stringx"
+	"github.com/zeromicro/go-zero/core/stores/sqlc"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"github.com/zeromicro/go-zero/core/stringx"
 	"github.com/zeromicro/go-zero/tools/goctl/model/sql/builderx"
 )
 

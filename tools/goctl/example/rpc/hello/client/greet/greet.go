@@ -8,7 +8,7 @@ import (
 
 	"github.com/zeromicro/go-zero/tools/goctl/example/rpc/hello/pb/hello"
 
-	"github.com/jiangz222/go-zero/zrpc"
+	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
 )
 

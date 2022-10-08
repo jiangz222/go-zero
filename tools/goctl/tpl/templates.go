@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/jiangz222/go-zero/core/errorx"
 	"github.com/logrusorgru/aurora"
 	"github.com/spf13/cobra"
+	"github.com/zeromicro/go-zero/core/errorx"
 	"github.com/zeromicro/go-zero/tools/goctl/api/apigen"
 	"github.com/zeromicro/go-zero/tools/goctl/api/gogen"
 	apinew "github.com/zeromicro/go-zero/tools/goctl/api/new"

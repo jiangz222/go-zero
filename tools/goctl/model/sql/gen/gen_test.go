@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jiangz222/go-zero/core/logx"
-	"github.com/jiangz222/go-zero/core/stringx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/stringx"
 
 	"github.com/zeromicro/go-zero/tools/goctl/config"
 	"github.com/zeromicro/go-zero/tools/goctl/model/sql/builderx"
