@@ -275,3 +275,13 @@ If you like or are using this project to learn or start your solution, please gi
 ## Buy me a coffee
 
 <a href="https://www.buymeacoffee.com/kevwan" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+## How to update to specific releaes of zeromicro/go-zero
+
+- git pull zero v1.4.3
+- fix conflicts
+- change jiangz222/go-zero/go.mod
+
+## jiangz222/go-zero changes
+
+- mongo client options : https://github.com/jiangz222/go-zero/commit/328f744f4d302ac918911e1b87c9346bf51e0a78) and https://github.com/jiangz222/go-zero/commit/b8eb7f87957dcca91382da3f6a561b7fa2adc85e 
