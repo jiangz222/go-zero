@@ -71,6 +71,12 @@ func NewModel(uri, db, collection string, opts ...Option) (*Model, error) {
 
 // NewModelWithClientOption returns a Model with client option
 func NewModelWithClientOption(uri, db, collection string, clientOpts *mopt.ClientOptions, opts ...Option) (*Model, error) {
+	if strings.Contains(uri, "?") {
+		uri = uri + "&rs=option"
+	} else {
+		uri = uri + "?rs=option"
+	}
+
 	cli, err := getClient(uri, clientOpts)
 	if err != nil {
 		return nil, err

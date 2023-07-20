@@ -3,6 +3,7 @@ package monc
 import (
 	"context"
 	"log"
+	"strings"
 
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/mon"
@@ -39,6 +40,12 @@ func MustNewModel(uri, db, collection string, c cache.CacheConf, opts ...cache.O
 
 // MustNewModelWithClientOptions returns a Model with a cache cluster, exists on errors.
 func MustNewModelWithClientOptions(uri, db, collection string, c cache.CacheConf, clientOpts *mopt.ClientOptions, opts ...cache.Option) *Model {
+	if strings.Contains(uri, "?") {
+		uri = uri + "&rs=option"
+	} else {
+		uri = uri + "?rs=option"
+	}
+
 	model, err := NewModelWithClientOption(uri, db, collection, c, clientOpts, opts...)
 	if err != nil {
 		log.Fatal(err)
