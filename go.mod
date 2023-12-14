@@ -48,9 +48,9 @@ require (
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
 )
 
+require github.com/google/pprof v0.0.0-20211214055906-6f57359322fd // indirect
+
 require (
-	github.com/felixge/fgprof v0.9.3
-	github.com/zeromicro/go-zero v1.6.0
 	github.com/alicebob/gopher-json v0.0.0-20230218143504-906a9b012302 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bufbuild/protocompile v0.6.0 // indirect
@@ -98,6 +98,7 @@ require (
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	github.com/yuin/gopher-lua v1.1.0 // indirect
+	github.com/zeromicro/go-zero v1.6.0
 	go.etcd.io/etcd/client/pkg/v3 v3.5.10 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.19.0 // indirect
 	go.opentelemetry.io/otel/metric v1.19.0 // indirect
