@@ -6,7 +6,10 @@ import (
 	"github.com/zeromicro/go-zero/core/lang"
 	"github.com/zeromicro/go-zero/core/logx"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/client-go/tools/cache"
 )
+
+var _ cache.ResourceEventHandler = (*EventHandler)(nil)
 
 // EventHandler is ResourceEventHandler implementation.
 type EventHandler struct {
@@ -24,7 +27,7 @@ func NewEventHandler(update func([]string)) *EventHandler {
 }
 
 // OnAdd handles the endpoints add events.
-func (h *EventHandler) OnAdd(obj interface{}) {
+func (h *EventHandler) OnAdd(obj any, _ bool) {
 	endpoints, ok := obj.(*v1.Endpoints)
 	if !ok {
 		logx.Errorf("%v is not an object with type *v1.Endpoints", obj)
@@ -50,7 +53,7 @@ func (h *EventHandler) OnAdd(obj interface{}) {
 }
 
 // OnDelete handles the endpoints delete events.
-func (h *EventHandler) OnDelete(obj interface{}) {
+func (h *EventHandler) OnDelete(obj any) {
 	endpoints, ok := obj.(*v1.Endpoints)
 	if !ok {
 		logx.Errorf("%v is not an object with type *v1.Endpoints", obj)
@@ -76,7 +79,7 @@ func (h *EventHandler) OnDelete(obj interface{}) {
 }
 
 // OnUpdate handles the endpoints update events.
-func (h *EventHandler) OnUpdate(oldObj, newObj interface{}) {
+func (h *EventHandler) OnUpdate(oldObj, newObj any) {
 	oldEndpoints, ok := oldObj.(*v1.Endpoints)
 	if !ok {
 		logx.Errorf("%v is not an object with type *v1.Endpoints", oldObj)

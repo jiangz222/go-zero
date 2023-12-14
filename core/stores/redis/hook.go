@@ -14,7 +14,6 @@ import (
 	"github.com/zeromicro/go-zero/core/mapping"
 	"github.com/zeromicro/go-zero/core/timex"
 	"github.com/zeromicro/go-zero/core/trace"
-	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	oteltrace "go.opentelemetry.io/otel/trace"
@@ -25,15 +24,13 @@ const spanName = "redis"
 
 var (
 	startTimeKey          = contextKey("startTime")
-	durationHook          = hook{tracer: otel.GetTracerProvider().Tracer(trace.TraceName)}
+	durationHook          = hook{}
 	redisCmdsAttributeKey = attribute.Key("redis.cmds")
 )
 
 type (
 	contextKey string
-	hook       struct {
-		tracer oteltrace.Tracer
-	}
+	hook       struct{}
 )
 
 func (h hook) BeforeProcess(ctx context.Context, cmd red.Cmder) (context.Context, error) {
@@ -57,9 +54,10 @@ func (h hook) AfterProcess(ctx context.Context, cmd red.Cmder) error {
 	duration := timex.Since(start)
 	if duration > slowThreshold.Load() {
 		logDuration(ctx, []red.Cmder{cmd}, duration)
+		metricSlowCount.Inc(cmd.Name())
 	}
 
-	metricReqDur.Observe(int64(duration/time.Millisecond), cmd.Name())
+	metricReqDur.ObserveFloat(float64(duration)/float64(time.Millisecond), cmd.Name())
 	if msg := formatError(err); len(msg) > 0 {
 		metricReqErr.Inc(cmd.Name(), msg)
 	}
@@ -106,7 +104,7 @@ func (h hook) AfterProcessPipeline(ctx context.Context, cmds []red.Cmder) error 
 		logDuration(ctx, cmds, duration)
 	}
 
-	metricReqDur.Observe(int64(duration/time.Millisecond), "Pipeline")
+	metricReqDur.Observe(duration.Milliseconds(), "Pipeline")
 	if msg := formatError(batchError.Err()); len(msg) > 0 {
 		metricReqErr.Inc("Pipeline", msg)
 	}
@@ -155,7 +153,9 @@ func logDuration(ctx context.Context, cmds []red.Cmder, duration time.Duration) 
 }
 
 func (h hook) startSpan(ctx context.Context, cmds ...red.Cmder) context.Context {
-	ctx, span := h.tracer.Start(ctx,
+	tracer := trace.TracerFromContext(ctx)
+
+	ctx, span := tracer.Start(ctx,
 		spanName,
 		oteltrace.WithSpanKind(oteltrace.SpanKindClient),
 	)

@@ -7,9 +7,9 @@ import (
 	"net/http/pprof"
 	"sync"
 
-	"github.com/felixge/fgprof"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/prometheus"
 	"github.com/zeromicro/go-zero/core/threading"
 	"github.com/zeromicro/go-zero/internal/health"
 )
@@ -19,13 +19,13 @@ var once sync.Once
 // Server is inner http server, expose some useful observability information of app.
 // For example health check, metrics and pprof.
 type Server struct {
-	config *Config
+	config Config
 	server *http.ServeMux
 	routes []string
 }
 
 // NewServer returns a new inner http Server.
-func NewServer(config *Config) *Server {
+func NewServer(config Config) *Server {
 	return &Server{
 		config: config,
 		server: http.NewServeMux(),
@@ -42,11 +42,12 @@ func (s *Server) addRoutes() {
 
 	// metrics
 	if s.config.EnableMetrics {
+		// enable prometheus global switch
+		prometheus.Enable()
 		s.handleFunc(s.config.MetricsPath, promhttp.Handler().ServeHTTP)
 	}
 	// pprof
 	if s.config.EnablePprof {
-		s.handleFunc("/debug/fgprof", fgprof.Handler().(http.HandlerFunc))
 		s.handleFunc("/debug/pprof/", pprof.Index)
 		s.handleFunc("/debug/pprof/cmdline", pprof.Cmdline)
 		s.handleFunc("/debug/pprof/profile", pprof.Profile)
@@ -76,7 +77,7 @@ func (s *Server) StartAsync() {
 func StartAgent(c Config) {
 	once.Do(func() {
 		if c.Enabled {
-			s := NewServer(&c)
+			s := NewServer(c)
 			s.StartAsync()
 		}
 	})

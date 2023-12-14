@@ -9,61 +9,65 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// TomlToJson converts TOML data into its JSON representation.
 func TomlToJson(data []byte) ([]byte, error) {
-	var val interface{}
+	var val any
 	if err := toml.NewDecoder(bytes.NewReader(data)).Decode(&val); err != nil {
 		return nil, err
 	}
 
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(val); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return encodeToJSON(val)
 }
 
+// YamlToJson converts YAML data into its JSON representation.
 func YamlToJson(data []byte) ([]byte, error) {
-	var val interface{}
+	var val any
 	if err := yaml.Unmarshal(data, &val); err != nil {
 		return nil, err
 	}
 
-	val = toStringKeyMap(val)
-
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(val); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return encodeToJSON(toStringKeyMap(val))
 }
 
-func convertKeyToString(in map[interface{}]interface{}) map[string]interface{} {
-	res := make(map[string]interface{})
+// convertKeyToString ensures all keys of the map are of type string.
+func convertKeyToString(in map[any]any) map[string]any {
+	res := make(map[string]any)
 	for k, v := range in {
 		res[lang.Repr(k)] = toStringKeyMap(v)
 	}
 	return res
 }
 
-func convertNumberToJsonNumber(in interface{}) json.Number {
+// convertNumberToJsonNumber converts numbers into json.Number type for compatibility.
+func convertNumberToJsonNumber(in any) json.Number {
 	return json.Number(lang.Repr(in))
 }
 
-func convertSlice(in []interface{}) []interface{} {
-	res := make([]interface{}, len(in))
+// convertSlice processes slice items to ensure key compatibility.
+func convertSlice(in []any) []any {
+	res := make([]any, len(in))
 	for i, v := range in {
 		res[i] = toStringKeyMap(v)
 	}
 	return res
 }
 
-func toStringKeyMap(v interface{}) interface{} {
+// encodeToJSON encodes the given value into its JSON representation.
+func encodeToJSON(val any) ([]byte, error) {
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(val); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+// toStringKeyMap processes the data to ensure that all map keys are of type string.
+func toStringKeyMap(v any) any {
 	switch v := v.(type) {
-	case []interface{}:
+	case []any:
 		return convertSlice(v)
-	case map[interface{}]interface{}:
+	case map[any]any:
 		return convertKeyToString(v)
 	case bool, string:
 		return v

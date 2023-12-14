@@ -30,6 +30,7 @@ const (
 	leftSquareBracket  = '['
 	rightSquareBracket = ']'
 	segmentSeparator   = ','
+	intSize            = 32 << (^uint(0) >> 63) // 32 or 64
 )
 
 var (
@@ -56,7 +57,7 @@ type (
 
 // Deref dereferences a type, if pointer type, returns its element type.
 func Deref(t reflect.Type) reflect.Type {
-	if t.Kind() == reflect.Ptr {
+	for t.Kind() == reflect.Ptr {
 		t = t.Elem()
 	}
 
@@ -64,12 +65,22 @@ func Deref(t reflect.Type) reflect.Type {
 }
 
 // Repr returns the string representation of v.
-func Repr(v interface{}) string {
+func Repr(v any) string {
 	return lang.Repr(v)
 }
 
+// SetValue sets target to value, pointers are processed automatically.
+func SetValue(tp reflect.Type, value, target reflect.Value) {
+	value.Set(convertTypeOfPtr(tp, target))
+}
+
+// SetMapIndexValue sets target to value at key position, pointers are processed automatically.
+func SetMapIndexValue(tp reflect.Type, value, key, target reflect.Value) {
+	value.SetMapIndex(key, convertTypeOfPtr(tp, target))
+}
+
 // ValidatePtr validates v if it's a valid pointer.
-func ValidatePtr(v *reflect.Value) error {
+func ValidatePtr(v reflect.Value) error {
 	// sequence is very important, IsNil must be called after checking Kind() with reflect.Ptr,
 	// panic otherwise
 	if !v.IsValid() || v.Kind() != reflect.Ptr || v.IsNil() {
@@ -79,7 +90,7 @@ func ValidatePtr(v *reflect.Value) error {
 	return nil
 }
 
-func convertType(kind reflect.Kind, str string) (interface{}, error) {
+func convertTypeFromString(kind reflect.Kind, str string) (any, error) {
 	switch kind {
 	case reflect.Bool:
 		switch strings.ToLower(str) {
@@ -90,32 +101,52 @@ func convertType(kind reflect.Kind, str string) (interface{}, error) {
 		default:
 			return false, errTypeMismatch
 		}
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		intValue, err := strconv.ParseInt(str, 10, 64)
-		if err != nil {
-			return 0, fmt.Errorf("the value %q cannot parsed as int", str)
-		}
-
-		return intValue, nil
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		uintValue, err := strconv.ParseUint(str, 10, 64)
-		if err != nil {
-			return 0, fmt.Errorf("the value %q cannot parsed as uint", str)
-		}
-
-		return uintValue, nil
-	case reflect.Float32, reflect.Float64:
-		floatValue, err := strconv.ParseFloat(str, 64)
-		if err != nil {
-			return 0, fmt.Errorf("the value %q cannot parsed as float", str)
-		}
-
-		return floatValue, nil
+	case reflect.Int:
+		return strconv.ParseInt(str, 10, intSize)
+	case reflect.Int8:
+		return strconv.ParseInt(str, 10, 8)
+	case reflect.Int16:
+		return strconv.ParseInt(str, 10, 16)
+	case reflect.Int32:
+		return strconv.ParseInt(str, 10, 32)
+	case reflect.Int64:
+		return strconv.ParseInt(str, 10, 64)
+	case reflect.Uint:
+		return strconv.ParseUint(str, 10, intSize)
+	case reflect.Uint8:
+		return strconv.ParseUint(str, 10, 8)
+	case reflect.Uint16:
+		return strconv.ParseUint(str, 10, 16)
+	case reflect.Uint32:
+		return strconv.ParseUint(str, 10, 32)
+	case reflect.Uint64:
+		return strconv.ParseUint(str, 10, 64)
+	case reflect.Float32:
+		return strconv.ParseFloat(str, 32)
+	case reflect.Float64:
+		return strconv.ParseFloat(str, 64)
 	case reflect.String:
 		return str, nil
 	default:
 		return nil, errUnsupportedType
 	}
+}
+
+func convertTypeOfPtr(tp reflect.Type, target reflect.Value) reflect.Value {
+	// keep the original value is a pointer
+	if tp.Kind() == reflect.Ptr && target.CanAddr() {
+		tp = tp.Elem()
+		target = target.Addr()
+	}
+
+	for tp.Kind() == reflect.Ptr {
+		p := reflect.New(target.Type())
+		p.Elem().Set(target)
+		target = p
+		tp = tp.Elem()
+	}
+
+	return target
 }
 
 func doParseKeyAndOptions(field reflect.StructField, value string) (string, *fieldOptions, error) {
@@ -228,7 +259,7 @@ func parseGroupedSegments(val string) []string {
 
 // don't modify returned fieldOptions, it's cached and shared among different calls.
 func parseKeyAndOptions(tagName string, field reflect.StructField) (string, *fieldOptions, error) {
-	value := field.Tag.Get(tagName)
+	value := strings.TrimSpace(field.Tag.Get(tagName))
 	if len(value) == 0 {
 		return field.Name, nil, nil
 	}
@@ -343,10 +374,8 @@ func parseOption(fieldOpts *fieldOptions, fieldName, option string) error {
 			fieldOpts.Optional = true
 			fieldOpts.OptionalDep = segs[1]
 		default:
-			return fmt.Errorf("field %s has wrong optional", fieldName)
+			return fmt.Errorf("field %q has wrong optional", fieldName)
 		}
-	case option == optionalOption:
-		fieldOpts.Optional = true
 	case strings.HasPrefix(option, optionsOption):
 		val, err := parseProperty(fieldName, optionsOption, option)
 		if err != nil {
@@ -402,7 +431,7 @@ func parseOptions(val string) []string {
 func parseProperty(field, tag, val string) (string, error) {
 	segs := strings.Split(val, equalToken)
 	if len(segs) != 2 {
-		return "", fmt.Errorf("field %s has wrong %s", field, tag)
+		return "", fmt.Errorf("field %q has wrong tag value %q", field, tag)
 	}
 
 	return strings.TrimSpace(segs[1]), nil
@@ -457,32 +486,35 @@ func parseSegments(val string) []string {
 	return segments
 }
 
-func setMatchedPrimitiveValue(kind reflect.Kind, value reflect.Value, v interface{}) error {
+func setMatchedPrimitiveValue(kind reflect.Kind, value reflect.Value, v any) error {
 	switch kind {
 	case reflect.Bool:
 		value.SetBool(v.(bool))
+		return nil
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		value.SetInt(v.(int64))
+		return nil
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		value.SetUint(v.(uint64))
+		return nil
 	case reflect.Float32, reflect.Float64:
 		value.SetFloat(v.(float64))
+		return nil
 	case reflect.String:
 		value.SetString(v.(string))
+		return nil
 	default:
 		return errUnsupportedType
 	}
-
-	return nil
 }
 
-func setValue(kind reflect.Kind, value reflect.Value, str string) error {
+func setValueFromString(kind reflect.Kind, value reflect.Value, str string) error {
 	if !value.CanSet() {
 		return errValueNotSettable
 	}
 
 	value = ensureValue(value)
-	v, err := convertType(kind, str)
+	v, err := convertTypeFromString(kind, str)
 	if err != nil {
 		return err
 	}
@@ -509,7 +541,7 @@ func structValueRequired(tag string, tp reflect.Type) (bool, error) {
 	return required, err
 }
 
-func toFloat64(v interface{}) (float64, bool) {
+func toFloat64(v any) (float64, bool) {
 	switch val := v.(type) {
 	case int:
 		return float64(val), true
@@ -550,12 +582,13 @@ func usingDifferentKeys(key string, field reflect.StructField) bool {
 	return false
 }
 
-func validateAndSetValue(kind reflect.Kind, value reflect.Value, str string, opts *fieldOptionsWithContext) error {
+func validateAndSetValue(kind reflect.Kind, value reflect.Value, str string,
+	opts *fieldOptionsWithContext) error {
 	if !value.CanSet() {
 		return errValueNotSettable
 	}
 
-	v, err := convertType(kind, str)
+	v, err := convertTypeFromString(kind, str)
 	if err != nil {
 		return err
 	}
@@ -596,12 +629,12 @@ func validateNumberRange(fv float64, nr *numberRange) error {
 	return nil
 }
 
-func validateValueInOptions(val interface{}, options []string) error {
+func validateValueInOptions(val any, options []string) error {
 	if len(options) > 0 {
 		switch v := val.(type) {
 		case string:
 			if !stringx.Contains(options, v) {
-				return fmt.Errorf(`error: value "%s" is not defined in options "%v"`, v, options)
+				return fmt.Errorf(`error: value %q is not defined in options "%v"`, v, options)
 			}
 		default:
 			if !stringx.Contains(options, Repr(v)) {
@@ -613,7 +646,7 @@ func validateValueInOptions(val interface{}, options []string) error {
 	return nil
 }
 
-func validateValueRange(mapValue interface{}, opts *fieldOptionsWithContext) error {
+func validateValueRange(mapValue any, opts *fieldOptionsWithContext) error {
 	if opts == nil || opts.Range == nil {
 		return nil
 	}

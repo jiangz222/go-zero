@@ -1,10 +1,8 @@
 //go:build linux
-// +build linux
 
 package stat
 
 import (
-	"os"
 	"strconv"
 	"sync/atomic"
 	"testing"
@@ -13,8 +11,7 @@ import (
 )
 
 func TestReport(t *testing.T) {
-	os.Setenv(clusterNameKey, "test-cluster")
-	defer os.Unsetenv(clusterNameKey)
+	t.Setenv(clusterNameKey, "test-cluster")
 
 	var count int32
 	SetReporter(func(s string) {

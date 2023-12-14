@@ -1,6 +1,10 @@
 package logx
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/zeromicro/go-zero/core/syncx"
+)
 
 const (
 	// DebugLevel logs everything
@@ -16,13 +20,13 @@ const (
 const (
 	jsonEncodingType = iota
 	plainEncodingType
-
-	plainEncoding    = "plain"
-	plainEncodingSep = '\t'
-	sizeRotationRule = "size"
 )
 
 const (
+	plainEncoding    = "plain"
+	plainEncodingSep = '\t'
+	sizeRotationRule = "size"
+
 	accessFilename = "access.log"
 	errorFilename  = "error.log"
 	severeFilename = "severe.log"
@@ -53,6 +57,7 @@ const (
 	spanKey      = "span"
 	timestampKey = "@timestamp"
 	traceKey     = "trace"
+	truncatedKey = "truncated"
 )
 
 var (
@@ -60,4 +65,8 @@ var (
 	ErrLogPathNotSet = errors.New("log path must be set")
 	// ErrLogServiceNameNotSet is an error that indicates that the service name is not set.
 	ErrLogServiceNameNotSet = errors.New("log service name must be set")
+	// ExitOnFatal defines whether to exit on fatal errors, defined here to make it easier to test.
+	ExitOnFatal = syncx.ForAtomicBool(true)
+
+	truncatedField = Field(truncatedKey, true)
 )

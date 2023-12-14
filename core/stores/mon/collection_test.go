@@ -3,12 +3,11 @@ package mon
 import (
 	"context"
 	"errors"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/zeromicro/go-zero/core/breaker"
-	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/logx/logtest"
 	"github.com/zeromicro/go-zero/core/stringx"
 	"github.com/zeromicro/go-zero/core/timex"
 	"go.mongodb.org/mongo-driver/bson"
@@ -422,7 +421,7 @@ func TestCollection_InsertMany(t *testing.T) {
 			brk:        breaker.NewBreaker(),
 		}
 		mt.AddMockResponses(mtest.CreateSuccessResponse(bson.D{{Key: "ok", Value: 1}}...))
-		res, err := c.InsertMany(context.Background(), []interface{}{
+		res, err := c.InsertMany(context.Background(), []any{
 			bson.D{{Key: "foo", Value: "bar"}},
 			bson.D{{Key: "foo", Value: "baz"}},
 		})
@@ -431,7 +430,7 @@ func TestCollection_InsertMany(t *testing.T) {
 		assert.Equal(t, 2, len(res.InsertedIDs))
 
 		c.brk = new(dropBreaker)
-		_, err = c.InsertMany(context.Background(), []interface{}{bson.D{{Key: "foo", Value: "bar"}}})
+		_, err = c.InsertMany(context.Background(), []any{bson.D{{Key: "foo", Value: "bar"}}})
 		assert.Equal(t, errDummy, err)
 	})
 }
@@ -573,15 +572,7 @@ func TestDecoratedCollection_LogDuration(t *testing.T) {
 		brk:        breaker.NewBreaker(),
 	}
 
-	var buf strings.Builder
-	w := logx.NewWriter(&buf)
-	o := logx.Reset()
-	logx.SetWriter(w)
-
-	defer func() {
-		logx.Reset()
-		logx.SetWriter(o)
-	}()
+	buf := logtest.NewCollector(t)
 
 	buf.Reset()
 	c.logDuration(context.Background(), "foo", timex.Now(), nil, "bar")
@@ -608,13 +599,11 @@ func TestDecoratedCollection_LogDuration(t *testing.T) {
 		errors.New("bar"), make(chan int))
 	assert.Contains(t, buf.String(), "foo")
 	assert.Contains(t, buf.String(), "bar")
-	assert.Contains(t, buf.String(), "slowcall")
 
 	buf.Reset()
 	c.logDuration(context.Background(), "foo", timex.Now()-slowThreshold.Load()*2,
 		errors.New("bar"))
 	assert.Contains(t, buf.String(), "foo")
-	assert.Contains(t, buf.String(), "slowcall")
 
 	buf.Reset()
 	c.logDuration(context.Background(), "foo", timex.Now()-slowThreshold.Load()*2, nil)

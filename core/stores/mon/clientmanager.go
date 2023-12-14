@@ -3,14 +3,11 @@ package mon
 import (
 	"context"
 	"io"
-	"time"
 
 	"github.com/zeromicro/go-zero/core/syncx"
 	"go.mongodb.org/mongo-driver/mongo"
 	mopt "go.mongodb.org/mongo-driver/mongo/options"
 )
-
-const defaultTimeout = time.Second
 
 var clientManager = syncx.NewResourceManager()
 
@@ -38,7 +35,6 @@ func getClient(url string, clientOpts ...*mopt.ClientOptions) (*mongo.Client, er
 			opt = mopt.MergeClientOptions(clientOpts[0], opt)
 		}
 		cli, err := mongo.Connect(context.Background(), opt)
-
 		if err != nil {
 			return nil, err
 		}
