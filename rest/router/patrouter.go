@@ -2,9 +2,11 @@ package router
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/search"
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -57,12 +59,14 @@ func (pr *patRouter) Handle(method, reqPath string, handler http.Handler) error 
 }
 
 func (pr *patRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	start := time.Now().Local()
 	reqPath := path.Clean(r.URL.Path)
 	if tree, ok := pr.trees[r.Method]; ok {
 		if result, ok := tree.Search(reqPath); ok {
 			if len(result.Params) > 0 {
 				r = pathvar.WithVars(r, result.Params)
 			}
+			fmt.Printf("[patRouter] for url %s times: %v, timee: %v\n", reqPath, start, time.Now())
 			result.Item.(http.Handler).ServeHTTP(w, r)
 			return
 		}
@@ -75,6 +79,7 @@ func (pr *patRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if pr.notAllowed != nil {
+		fmt.Printf("[patRouter - notAllowed] for url %s times: %v, timee: %v\n", reqPath, start, time.Now())
 		pr.notAllowed.ServeHTTP(w, r)
 	} else {
 		w.Header().Set(allowHeader, allows)
