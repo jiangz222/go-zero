@@ -160,7 +160,6 @@ func (m *Model) Find(ctx context.Context, v, filter any, opts ...*mopt.FindOptio
 		return err
 	}
 	defer cur.Close(ctx)
-
 	return m.CursorAll(ctx, cur, v)
 }
 
@@ -289,11 +288,10 @@ func (m *Model) CursorAll(ctx context.Context, cur *mongo.Cursor, v any) (err er
 	defer func() {
 		endSpan(span, err)
 	}()
-
 	err = m.brk.DoWithAcceptable(func() error {
 		starTime := timex.Now()
 		defer func() {
-			logDuration(ctx, cursorAll, cursorAll, starTime, err)
+			logDuration(ctx, m.name, cursorAll, starTime, err)
 		}()
 
 		return cur.All(ctx, v)
