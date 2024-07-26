@@ -18,6 +18,7 @@ const (
 	commitTransaction = "CommitTransaction"
 	withTransaction   = "WithTransaction"
 	endSession        = "EndSession"
+	cursorAll         = "CursorAll"
 )
 
 type (
@@ -129,7 +130,7 @@ func (m *Model) Aggregate(ctx context.Context, v, pipeline any, opts ...*mopt.Ag
 	}
 	defer cur.Close(ctx)
 
-	return cur.All(ctx, v)
+	return m.CursorAll(ctx, cur, v)
 }
 
 // DeleteMany deletes documents that match the filter.
@@ -160,7 +161,7 @@ func (m *Model) Find(ctx context.Context, v, filter any, opts ...*mopt.FindOptio
 	}
 	defer cur.Close(ctx)
 
-	return cur.All(ctx, v)
+	return m.CursorAll(ctx, cur, v)
 }
 
 // FindOne finds the first document that matches the filter.
@@ -281,4 +282,22 @@ func (w *wrappedSession) EndSession(ctx context.Context) {
 		w.Session.EndSession(ctx)
 		return nil
 	}, acceptable)
+}
+
+func (m *Model) CursorAll(ctx context.Context, cur *mongo.Cursor, v any) (err error) {
+	ctx, span := startSpan(ctx, cursorAll)
+	defer func() {
+		endSpan(span, err)
+	}()
+
+	err = m.brk.DoWithAcceptable(func() error {
+		starTime := timex.Now()
+		defer func() {
+			logDuration(ctx, cursorAll, cursorAll, starTime, err)
+		}()
+
+		return cur.All(ctx, v)
+	}, acceptable)
+
+	return
 }
