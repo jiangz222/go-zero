@@ -62,10 +62,9 @@ func NewModel(uri, db, collection string, opts ...Option) (*Model, error) {
 		return nil, err
 	}
 
-	name := strings.Join([]string{uri, collection}, "/")
 	brk := breaker.GetBreaker(uri)
 	coll := newCollection(cli.Database(db).Collection(collection), brk)
-	return newModel(name, cli, coll, brk, opts...), nil
+	return newModel(collection, cli, coll, brk, opts...), nil
 }
 
 // NewModelWithClientOption returns a Model with client option
