@@ -1,7 +1,8 @@
 package handler
 
 import (
-	"fmt"
+	"net/http"
+
 	"github.com/zeromicro/go-zero/core/collection"
 	"github.com/zeromicro/go-zero/core/trace"
 	"github.com/zeromicro/go-zero/rest/internal/response"
@@ -9,9 +10,6 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	oteltrace "go.opentelemetry.io/otel/trace"
-	"net/http"
-	"strings"
-	"time"
 )
 
 type (
@@ -42,9 +40,6 @@ func TraceHandler(serviceName, path string, opts ...TraceOption) func(http.Handl
 			spanName := path
 			if len(spanName) == 0 {
 				spanName = r.URL.Path
-			}
-			if strings.Contains(spanName, "/revenue") || strings.Contains(spanName, "/yesterdayearn") {
-				fmt.Printf("[TraceHandler]: for url %s into tracehandler %v \n ", spanName, time.Now().Local())
 			}
 
 			if ignorePaths.Contains(spanName) {
