@@ -80,10 +80,9 @@ func NewModelWithClientOption(uri, db, collection string, clientOpts *mopt.Clien
 		return nil, err
 	}
 
-	name := strings.Join([]string{uri, collection}, "/")
 	brk := breaker.GetBreaker(uri)
 	coll := newCollection(cli.Database(db).Collection(collection), brk)
-	return newModel(name, cli, coll, brk, opts...), nil
+	return newModel(collection, cli, coll, brk, opts...), nil
 }
 func newModel(name string, cli *mongo.Client, coll Collection, brk breaker.Breaker,
 	opts ...Option) *Model {
