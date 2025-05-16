@@ -27,9 +27,11 @@ func logDuration(ctx context.Context, name, method string, startTime time.Durati
 
 	if logSlowMon.True() && duration > slowThreshold.Load() {
 		logger.Slowf("[MONGO] mongo(%s) - slowcall - %s - ok", name, method)
+		metricSlowCount.Inc(name, method)
 	} else if logMon.True() {
 		logger.Infof("mongo(%s) - %s - ok", name, method)
 	}
+	metricReqDur.ObserveFloat(float64(duration)/float64(time.Millisecond), name, method)
 }
 
 func logDurationWithDocs(ctx context.Context, name, method string, startTime time.Duration,
@@ -45,9 +47,11 @@ func logDurationWithDocs(ctx context.Context, name, method string, startTime tim
 			logger.Errorf("mongo(%s) - %s - fail(%s)", name, method, err.Error())
 		} else if logSlowMon.True() && duration > slowThreshold.Load() {
 			logger.Slowf("[MONGO] mongo(%s) - slowcall - %s - ok", name, method)
+			metricSlowCount.Inc(name, method)
 		} else if logMon.True() {
 			logger.Infof("mongo(%s) - %s - ok", name, method)
 		}
+		metricReqDur.ObserveFloat(float64(duration)/float64(time.Millisecond), name, method)
 		return
 	}
 
@@ -55,7 +59,9 @@ func logDurationWithDocs(ctx context.Context, name, method string, startTime tim
 		logger.Errorf("mongo(%s) - %s - fail(%s) - %s", name, method, err.Error(), string(content))
 	} else if logSlowMon.True() && duration > slowThreshold.Load() {
 		logger.Slowf("[MONGO] mongo(%s) - slowcall - %s - ok - %s", name, method, string(content))
+		metricSlowCount.Inc(name, method)
 	} else if logMon.True() {
 		logger.Infof("mongo(%s) - %s - ok - %s", name, method, string(content))
 	}
+	metricReqDur.ObserveFloat(float64(duration)/float64(time.Millisecond), name, method)
 }
